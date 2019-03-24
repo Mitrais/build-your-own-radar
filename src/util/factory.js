@@ -1,6 +1,8 @@
 /* eslint no-constant-condition: "off" */
 
 const d3 = require('d3')
+const fetch = require('d3-fetch')
+const X = require('XLSX')
 const Tabletop = require('tabletop')
 const _ = {
   map: require('lodash/map'),
@@ -154,7 +156,7 @@ const GoogleSheet = function (sheetReference, sheetName) {
 const CSVDocument = function (url) {
   var self = {}
 
-  self.build = function () {
+  self.build = function () {    
     d3.csv(url, createBlips)
   }
 
@@ -180,6 +182,34 @@ const CSVDocument = function (url) {
   return self
 }
 
+const XLSXDocument = function (sheetId, sheetName) {
+  var self = {}
+
+  self.build = function () {    
+    fetch.blob(sheetId,{mode: 'no-cors'}).then(function(data){
+        var fileReader = new FileReader()
+        var name = sheetName
+        fileReader.onload = function process(event) {
+          try{
+            var workbook = X.read(event.target.result, {type: 'array'})
+            var sheetName = name || Object.keys(workbook.Sheets)[0]
+            var roa = X.utils.sheet_to_json(workbook.Sheets[sheetName],{raw:false}) || {}
+            plotRadar('Mitrais ' + sheetName, roa, sheetName, Object.keys(workbook.Sheets))
+          } catch (exception) {
+            plotErrorMessage(exception)
+          }
+        }
+        fileReader.readAsArrayBuffer(data)
+    })
+  }
+
+  self.init = function () {
+    plotLoading()
+    return self
+  }
+
+  return self
+}
 const DomainName = function (url) {
   var search = /.+:\/\/([^\\/]+)/
   var match = search.exec(decodeURIComponent(url.replace(/\+/g, ' ')))
@@ -204,31 +234,17 @@ const GoogleSheetInput = function () {
     var domainName = DomainName(window.location.search.substring(1))
     var queryString = window.location.href.match(/sheetId(.*)/)
     var queryParams = queryString ? QueryParams(queryString[0]) : {}
-
-    if (domainName && queryParams.sheetId.endsWith('csv')) {
+    if(queryParams.sheetId && queryParams.sheetId.endsWith('xlsx')){
+      sheet = XLSXDocument(queryParams.sheetId, queryParams.sheetName)
+      sheet.init().build()
+    } else if (domainName && queryParams.sheetId.endsWith('csv')) {
       sheet = CSVDocument(queryParams.sheetId)
       sheet.init().build()
     } else if (domainName && domainName.endsWith('google.com') && queryParams.sheetId) {
       sheet = GoogleSheet(queryParams.sheetId, queryParams.sheetName)
-      console.log(queryParams.sheetName)
-
       sheet.init().build()
     } else {
-      var content = d3.select('body')
-        .append('div')
-        .attr('class', 'input-sheet')
-      setDocumentTitle()
-
-      plotLogo(content)
-
-      var bannerText = '<div><h1>Build your own radar</h1><p>Once you\'ve <a href ="https://www.thoughtworks.com/radar/byor">created your Radar</a>, you can use this service' +
-        ' to generate an <br />interactive version of your Technology Radar. Not sure how? <a href ="https://www.thoughtworks.com/radar/how-to-byor">Read this first.</a></p></div>'
-
-      plotBanner(content, bannerText)
-
-      plotForm(content)
-
-      plotFooter(content)
+      window.location.search = '?sheetId=radar.xlsx'
     }
   }
 
@@ -268,10 +284,7 @@ function plotFooter (content) {
     .append('div')
     .attr('class', 'footer-content')
     .append('p')
-    .html('Powered by <a href="https://www.thoughtworks.com"> ThoughtWorks</a>. ' +
-      'By using this service you agree to <a href="https://www.thoughtworks.com/radar/tos">ThoughtWorks\' terms of use</a>. ' +
-      'You also agree to our <a href="https://www.thoughtworks.com/privacy-policy">privacy policy</a>, which describes how we will gather, use and protect any personal data contained in your public Google Sheet. ' +
-      'This software is <a href="https://github.com/thoughtworks/build-your-own-radar">open source</a> and available for download and self-hosting.')
+    .html('Powered by <a href="https://www.thoughtworks.com"> ThoughtWorks</a>.')
 }
 
 function plotBanner (content, text) {
