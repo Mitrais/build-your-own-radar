@@ -66,7 +66,7 @@ module.exports = {
 
   output: {
     path: buildPath,
-    publicPath: '/',
+    publicPath: '/radar',
     filename: '[name].[hash].js'
   },
 
