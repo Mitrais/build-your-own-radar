@@ -106,7 +106,7 @@ module.exports = {
       },
       {
         test: /\.(xlsx)$/,
-        exclude: /node_modules/,        
+        exclude: /node_modules/,
         loader: 'file-loader?name=[name].[ext]'
       },
       {
