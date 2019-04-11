@@ -2,7 +2,7 @@
 
 const d3 = require('d3')
 const fetch = require('d3-fetch')
-const X = require('XLSX')
+const X = require('xlsx')
 const Tabletop = require('tabletop')
 const _ = {
   map: require('lodash/map'),
