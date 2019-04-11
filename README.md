@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/Mitrais/radar/tree/master.svg?style=svg&circle-token=14bb76a82137d90baf9a9aee2c59988ff60babf0)](https://circleci.com/gh/Mitrais/radar/tree/master)
 [![Build Status](https://travis-ci.org/thoughtworks/build-your-own-radar.svg?branch=master)](https://travis-ci.org/thoughtworks/build-your-own-radar)
 [![Stars](https://badgen.net/github/stars/thoughtworks/build-your-own-radar)](https://github.com/thoughtworks/build-your-own-radar)
 [![dependencies Status](https://david-dm.org/thoughtworks/build-your-own-radar/status.svg)](https://david-dm.org/thoughtworks/build-your-own-radar)
