@@ -5,6 +5,7 @@ const path = require('path')
 const buildPath = path.join(__dirname, './dist')
 const args = require('yargs').argv
 
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const postcssPresetEnv = require('postcss-preset-env')
@@ -28,7 +29,7 @@ if (isDev) {
 }
 
 let plugins = [
-  new MiniCssExtractPlugin({ filename: '[name].[hash].css' }),
+  new MiniCssExtractPlugin({ filename: '[name].css' }),
   new HtmlWebpackPlugin({
     template: './src/index.html',
     chunks: ['main'],
@@ -43,7 +44,10 @@ let plugins = [
   new webpack.DefinePlugin({
     'process.env.CLIENT_ID': JSON.stringify(process.env.CLIENT_ID),
     'process.env.API_KEY': JSON.stringify(process.env.API_KEY)
-  })
+  }),
+  new CopyWebpackPlugin([
+    { from: '*.xlsx', to: buildPath }
+  ])
 ]
 
 if (isProd) {
@@ -66,8 +70,8 @@ module.exports = {
 
   output: {
     path: buildPath,
-    publicPath: '/radar/',
-    filename: '[name].[hash].js'
+    publicPath: '',
+    filename: '[name].js'
   },
 
   module: {
@@ -99,6 +103,11 @@ module.exports = {
         test: /\.(png|jpg|ico)$/,
         exclude: /node_modules/,
         use: [{ loader: 'file-loader?name=images/[name].[ext]&context=./src/images' }]
+      },
+      {
+        test: /\.(xlsx)$/,
+        exclude: /node_modules/,        
+        loader: 'file-loader?name=[name].[ext]'
       },
       {
         test: require.resolve('jquery'),

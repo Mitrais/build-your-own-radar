@@ -156,7 +156,7 @@ const GoogleSheet = function (sheetReference, sheetName) {
 const CSVDocument = function (url) {
   var self = {}
 
-  self.build = function () {    
+  self.build = function () {
     d3.csv(url, createBlips)
   }
 
@@ -185,21 +185,23 @@ const CSVDocument = function (url) {
 const XLSXDocument = function (sheetId, sheetName) {
   var self = {}
 
-  self.build = function () {    
-    fetch.blob(sheetId,{mode: 'no-cors'}).then(function(data){
-        var fileReader = new FileReader()
-        var name = sheetName
-        fileReader.onload = function process(event) {
-          try{
-            var workbook = X.read(event.target.result, {type: 'array'})
-            var sheetName = name || Object.keys(workbook.Sheets)[0]
-            var roa = X.utils.sheet_to_json(workbook.Sheets[sheetName],{raw:false}) || {}
-            plotRadar('Mitrais ' + sheetName, roa, sheetName, Object.keys(workbook.Sheets))
-          } catch (exception) {
-            plotErrorMessage(exception)
-          }
+  self.build = function () {
+    fetch.blob(sheetId, { mode: 'no-cors' }).then(function (data) {
+      var fileReader = new window.FileReader()
+      var name = sheetName
+      fileReader.onload = function process (event) {
+        try {
+          var workbook = X.read(event.target.result, { type: 'array' })
+          var sheetName = name || Object.keys(workbook.Sheets)[0]
+          var roa = X.utils.sheet_to_json(workbook.Sheets[sheetName], { raw: false }) || {}
+          plotRadar('Mitrais ' + sheetName, roa, sheetName, Object.keys(workbook.Sheets))
+        } catch (exception) {
+          plotErrorMessage(exception)
         }
-        fileReader.readAsArrayBuffer(data)
+      }
+      fileReader.readAsArrayBuffer(data)
+    }).catch(function (exception) {
+      plotErrorMessage(exception)
     })
   }
 
@@ -234,7 +236,7 @@ const GoogleSheetInput = function () {
     var domainName = DomainName(window.location.search.substring(1))
     var queryString = window.location.href.match(/sheetId(.*)/)
     var queryParams = queryString ? QueryParams(queryString[0]) : {}
-    if(queryParams.sheetId && queryParams.sheetId.endsWith('xlsx')){
+    if (queryParams.sheetId && queryParams.sheetId.endsWith('xlsx')) {
       sheet = XLSXDocument(queryParams.sheetId, queryParams.sheetName)
       sheet.init().build()
     } else if (domainName && queryParams.sheetId.endsWith('csv')) {
@@ -351,12 +353,7 @@ function plotErrorMessage (exception) {
   errorContainer.append('div').append('p')
     .html(faqMessage)
 
-  var homePageURL = window.location.protocol + '//' + window.location.hostname
-  homePageURL += (window.location.port === '' ? '' : ':' + window.location.port)
-  var homePage = '<a href=' + homePageURL + '>GO BACK</a>'
-
-  errorContainer.append('div').append('p')
-    .html(homePage)
+  plotForm(content)
 
   plotFooter(content)
 }

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "standard && istanbul cover jasmine",
+    "test": "standard && istanbul cover node_modules/jasmine/bin/jasmine.js",
     "test:lint": "npx standard",
     "dev": "webpack-dev-server --mode development --inline",
     "build": "webpack --mode production",
@@ -24,6 +24,7 @@
     "@babel/core": "^7.2.2",
     "babel-loader": "^8.0.4",
     "babel-preset-env": "^1.7.0",
+    "copy-webpack-plugin": "^5.0.2",
     "css-loader": "^2.0.1",
     "cssnano": "^4.1.10",
     "cypress": "^3.2.0",
