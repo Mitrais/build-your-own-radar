@@ -52,7 +52,7 @@ jobs:
           command: sudo pip install awscli
       - run:
           name: Deploy to S3
-          command: ls && aws s3 sync dist s3://mitrais-techradar-web/ --delete
+          command: ls && aws s3 sync dist s3://mitrais-technology-radar/ --delete
 
 workflows:
   version: 2
